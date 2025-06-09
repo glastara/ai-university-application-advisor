@@ -1,5 +1,8 @@
 # ReAct Agent Implementation
 
+**Attribution:**
+This code is based on materials from the AI Agents in LangGraph course by DeepLearning.AI, which itself is based on [Simon Willison's Python ReAct pattern](https://til.simonwillison.net/llms/python-react-pattern).
+
 This project implements a ReAct (Reasoning and Acting) agent that combines reasoning and acting in an interleaved manner. The agent uses GPT-4 to process questions and can perform specific actions like calculations and retrieving dog weight information.
 
 ## Project Structure
