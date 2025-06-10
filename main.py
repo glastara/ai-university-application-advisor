@@ -32,7 +32,7 @@ class Agent:
             raise Exception(
                 "OpenAI client not initialized. Call load_dotenv_and_init_client() first.")
         completion = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             temperature=0,
             messages=self.messages)
         # Return message it gets back from the LLM
@@ -87,7 +87,7 @@ def average_dog_weight(name):
     else:
         return "An average dog weights 50 lbs"
 
-
+# Create a dictionary of known actions
 known_actions = {
     "calculate": calculate,
     "average_dog_weight": average_dog_weight
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     # Example of a direct chat completion (from the notebook)
     # print("Testing direct chat completion:")
     # chat_completion = client.chat.completions.create(
-    #     model="gpt-3.5-turbo",
+    #     model="gpt-4.0-mini",
     #     messages=[{"role": "user", "content": "Hello world"}]
     # )
     # print(chat_completion.choices[0].message.content)
