@@ -3,9 +3,19 @@ import re
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
+from tavily import TavilyClient
 
 # Global OpenAI client
 client = None
+# Global Tavily client
+tavily_client = None
+
+
+def search_tavily(query):
+    if tavily_client is None:
+        raise Exception("Tavily client not initialized. Call load_dotenv_and_init_client() first.")
+    response = tavily_client.search(query)
+    return response
 
 
 class Agent:
@@ -32,7 +42,7 @@ class Agent:
             raise Exception(
                 "OpenAI client not initialized. Call load_dotenv_and_init_client() first.")
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-3.5-turbo",
             temperature=0,
             messages=self.messages)
         # Return message it gets back from the LLM
@@ -56,20 +66,24 @@ average_dog_weight:
 e.g. average_dog_weight: Collie
 returns average weight of a dog when given the breed
 
+search:
+e.g. search: What is the capital of France?
+Searches the web using Tavily and returns relevant information
+
 Example session:
 
-Question: How much does a Bulldog weigh?
-Thought: I should look the dogs weight using average_dog_weight
-Action: average_dog_weight: Bulldog
+Question: What is the population of Paris?
+Thought: I should search for information about Paris's population
+Action: search: What is the current population of Paris, France?
 PAUSE
 
 You will be called again with this:
 
-Observation: A Bulldog weights 51 lbs
+Observation: [Search results about Paris population]
 
 You then output:
 
-Answer: A bulldog weights 51 lbs
+Answer: Based on the search results, Paris has a population of approximately 2.2 million people.
 """.strip()
 
 
@@ -90,10 +104,11 @@ def average_dog_weight(name):
 # Create a dictionary of known actions
 known_actions = {
     "calculate": calculate,
-    "average_dog_weight": average_dog_weight
+    "average_dog_weight": average_dog_weight,
+    "search": search_tavily
 }
 
-action_re = re.compile('^Action: (\w+): (.*)$')
+action_re = re.compile(r'^Action: (\w+): (.*)$')
 
 
 def query(question, agent, max_turns=5):
@@ -125,13 +140,20 @@ def query(question, agent, max_turns=5):
 
 
 def load_dotenv_and_init_client():
-    global client
+    global client, tavily_client
     _ = load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY")
+    tavily_api_key = os.getenv("TAVILY_API_KEY")
+    
     if not api_key:
         raise ValueError(
             "OPENAI_API_KEY not found in .env file or environment variables.")
+    if not tavily_api_key:
+        raise ValueError(
+            "TAVILY_API_KEY not found in .env file or environment variables.")
+            
     client = OpenAI(api_key=api_key)
+    tavily_client = TavilyClient(api_key=tavily_api_key)
 
 
 if __name__ == "__main__":
