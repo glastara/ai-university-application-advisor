@@ -42,7 +42,7 @@ class Agent:
             raise Exception(
                 "OpenAI client not initialized. Call load_dotenv_and_init_client() first.")
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             temperature=0,
             messages=self.messages)
         # Return message it gets back from the LLM
