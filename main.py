@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from tavily import TavilyClient
 
-# Global OpenAI client
+# Global OpenRouter client
 client = None
 # Global Tavily client
 tavily_client = None
@@ -40,9 +40,9 @@ class Agent:
     def execute(self):
         if client is None:
             raise Exception(
-                "OpenAI client not initialized. Call load_dotenv_and_init_client() first.")
+                "OpenRouter client not initialized. Call load_dotenv_and_init_client() first.")
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="deepseek/deepseek-r1-0528-qwen3-8b:free",
             temperature=0,
             messages=self.messages)
         # Return message it gets back from the LLM
@@ -142,17 +142,17 @@ def query(question, agent, max_turns=5):
 def load_dotenv_and_init_client():
     global client, tavily_client
     _ = load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("OPENROUTER_API_KEY")
     tavily_api_key = os.getenv("TAVILY_API_KEY")
     
     if not api_key:
         raise ValueError(
-            "OPENAI_API_KEY not found in .env file or environment variables.")
+            "OPENROUTER_API_KEY not found in .env file or environment variables.")
     if not tavily_api_key:
         raise ValueError(
             "TAVILY_API_KEY not found in .env file or environment variables.")
             
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
     tavily_client = TavilyClient(api_key=tavily_api_key)
 
 

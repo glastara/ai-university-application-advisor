@@ -19,7 +19,7 @@ This project implements a ReAct (Reasoning and Acting) agent that combines reaso
   - `calculate`: Performs mathematical calculations
   - `average_dog_weight`: Returns average weights for different dog breeds
 - Conversation memory and context management
-- Integration with OpenAI's GPT-4 API
+- Integration with OpenRouter's deepseek/deepseek-r1-0528-qwen3-8b:free model
 
 ## Setup
 1. Create a virtual environment:
@@ -33,9 +33,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Create a `.env` file in the project root with your OpenAI API key:
+3. Create a `.env` file in the project root with your OpenRouter API key:
 ```
-OPENAI_API_KEY=your_api_key_here
+OPENROUTER_API_KEY=your_openrouter_api_key_here
 ```
 
 ## Usage
@@ -44,7 +44,7 @@ The main script includes an example query that demonstrates the agent's capabili
 ```python
 from main import Agent, load_dotenv_and_init_client, query
 
-# Initialize the OpenAI client
+# Initialize the OpenRouter and Tavily clients
 load_dotenv_and_init_client()
 
 # Create an agent instance
