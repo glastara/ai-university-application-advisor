@@ -153,7 +153,7 @@ def load_dotenv_and_init_client():
             "TAVILY_API_KEY not found in .env file or environment variables.")
             
     client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
-    tavily_client = TavilyClient(api_key=tavily_api_key)
+    tavily_client = TavilyClient(tavily_api_key)
 
 
 if __name__ == "__main__":
