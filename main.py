@@ -43,7 +43,7 @@ class Agent:
                 "OpenRouter client not initialized. Call load_dotenv_and_init_client() first.")
         completion = client.chat.completions.create(
             model="deepseek/deepseek-r1-0528-qwen3-8b:free",
-            temperature=0,
+            temperature=0.2,
             messages=self.messages)
         # Return message it gets back from the LLM
         return completion.choices[0].message.content
