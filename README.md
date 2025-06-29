@@ -1,31 +1,39 @@
-# ReAct Agent Implementation
+# University Application Advisor - ReAct Agent
 
 **Attribution:**
 This code is based on materials from the AI Agents in LangGraph course by DeepLearning.AI, which itself is based on [Simon Willison's Python ReAct pattern](https://til.simonwillison.net/llms/python-react-pattern).
 
-This project implements a ReAct (Reasoning and Acting) agent that combines reasoning and acting in an interleaved manner. The agent uses GPT-4 to process questions and can perform specific actions like calculations and retrieving dog weight information.
+This project implements a ReAct (Reasoning and Acting) agent that acts as an expert University Application Advisor specialising in UK higher education. The agent combines reasoning and acting to help students find suitable courses and provide guidance on their university applications using real-time web search capabilities.
 
 ## Project Structure
 - `main.py`: Contains the complete implementation including:
   - `Agent` class for handling conversations
-  - Action implementations (calculate, average_dog_weight)
+  - Action implementations (calculate, search)
   - Query processing and execution logic
+  - University advisor prompt and guidelines
 - `requirements.txt`: Project dependencies
 - `tests/`: Test cases directory
 
 ## Features
-- ReAct pattern implementation (Reasoning and Acting)
-- Support for multiple actions:
-  - `calculate`: Performs mathematical calculations
-  - `average_dog_weight`: Returns average weights for different dog breeds
-- Conversation memory and context management
-- Integration with OpenRouter's deepseek/deepseek-r1-0528-qwen3-8b:free model
+- **ReAct pattern implementation** (Reasoning and Acting)
+- **Real-time web search** using Tavily for current course information
+- **UCAS points calculation** for UK university applications
+- **Course recommendations** with entry requirements
+- **Application guidance** and focus areas
+- **Conversation memory** and context management
+- **Integration with OpenRouter** using deepseek/deepseek-r1-0528-qwen3-8b:free model
+
+## Available Actions
+- `search`: Searches the web for current course information, university rankings, entry requirements, and application deadlines
+  - Example: `search: "Computer Science courses UK universities 2026"`
+- `calculate`: Performs calculations for grade averages, UCAS points, or other numerical assessments
+  - Example: `calculate: (120 + 40 + 32)` for UCAS points calculation
 
 ## Setup
 1. Create a virtual environment:
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
 2. Install dependencies:
@@ -33,9 +41,10 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Create a `.env` file in the project root with your OpenRouter API key:
+3. Create a `.env` file in the project root with your API keys:
 ```
 OPENROUTER_API_KEY=your_openrouter_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
 ```
 
 ## Usage
@@ -44,26 +53,44 @@ The main script includes an example query that demonstrates the agent's capabili
 ```python
 from main import Agent, load_dotenv_and_init_client, query
 
-# Initialize the OpenRouter and Tavily clients
+# Initialise the OpenRouter and Tavily clients
 load_dotenv_and_init_client()
 
 # Create an agent instance
 agent = Agent(prompt)  # prompt is defined in main.py
 
-# Ask a question
-question = "I have 2 dogs, a border collie and a scottish terrier. What is their combined weight?"
+# Ask a question about university applications
+question = "I want to study Computer Science in the UK. I have A-levels in Maths (A), Physics (B), and English (C). What courses should I consider?"
 query(question, agent)
 ```
 
 The agent will:
-1. Process the question
-2. Use reasoning to determine required actions
-3. Execute actions and observe results
-4. Provide a final answer
+1. Process the student's academic background and interests
+2. Search for current course information and entry requirements
+3. Calculate UCAS points and assess eligibility
+4. Provide specific course recommendations
+5. Give actionable advice on application focus areas
 
-## Available Actions
-- `calculate`: Perform mathematical calculations
-  - Example: `calculate: 4 * 7 / 3`
-- `average_dog_weight`: Get average weight for dog breeds
-  - Example: `average_dog_weight: Collie`
-  - Supported breeds: Scottish Terrier, Border Collie, Toy Poodle
+## Example Output
+The agent provides comprehensive responses including:
+- **Course recommendations** with specific universities and entry requirements
+- **UCAS points calculations** based on A-level grades
+- **Application focus areas** and improvement suggestions
+- **Current information** about courses, fees, and deadlines
+- **Alternative pathways** when appropriate
+
+## Supported Queries
+The agent can help with:
+- Course recommendations for any subject
+- Entry requirement analysis
+- UCAS points calculations
+- Application strategy advice
+- University rankings and comparisons
+- Course structure and module information
+- Application deadlines and important dates
+
+## API Requirements
+- **OpenRouter API Key**: For accessing the DeepSeek model
+- **Tavily API Key**: For real-time web search capabilities
+
+Both services offer free tiers suitable for testing and development (trust me, I checked — very broke at the time of making this).

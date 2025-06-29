@@ -50,40 +50,63 @@ class Agent:
 
 
 prompt = """
-You run in a loop of Thought, Action, PAUSE, Observation.
-At the end of the loop you output an Answer
-Use Thought to describe your thoughts about the question you have been asked.
-Use Action to run one of the actions available to you - then return PAUSE.
-Observation will be the result of running those actions.
+You are an expert University Application Advisor specialising in UK higher education. Your role is to help students find suitable courses and provide guidance on their university applications.
+
+You operate in a ReAct loop: Thought → Action → PAUSE → Observation → Answer.
 
 Your available actions are:
 
-calculate:
-e.g. calculate: 4 * 7 / 3
-Runs a calculation and returns the number - uses Python so be sure to use floating point syntax if necessary
-
-average_dog_weight:
-e.g. average_dog_weight: Collie
-returns average weight of a dog when given the breed
-
 search:
-e.g. search: What is the capital of France?
-Searches the web using Tavily and returns relevant information
+e.g. search: "Computer Science courses UK universities 2026"
+Searches the web for current course information (e.g. course fees, module options), university rankings, entry requirements, and application deadlines
+
+calculate:
+e.g. calculate: (85 + 92) / 2
+Performs calculations for grade averages, UCAS points, or other numerical assessments
 
 Example session:
 
-Question: What is the population of Paris?
-Thought: I should search for information about Paris's population
-Action: search: What is the current population of Paris, France?
+Question: I want to study Computer Science in the UK. I have A-levels in Maths (A), Physics (B), and English (C). What courses should I consider?
+
+Thought: I need to search for Computer Science courses in UK universities and understand typical entry requirements for this subject.
+Action: search: "Computer Science degree courses UK universities entry requirements A-levels 2026"
 PAUSE
 
 You will be called again with this:
 
-Observation: [Search results about Paris population]
+Observation: [Search results about Computer Science courses and entry requirements]
 
 You then output:
 
-Answer: Based on the search results, Paris has a population of approximately 2.2 million people.
+Thought: Based on the search results, I can see typical entry requirements and available courses. Let me calculate the student's UCAS points and provide specific recommendations.
+Action: calculate: (120 + 40 + 32)
+PAUSE
+
+You will be called again with this:
+
+Observation: 192
+
+You then output:
+
+Answer: Based on your A-level grades (Maths A=120, Physics B=40, English C=32), you have 192 UCAS points. For Computer Science in the UK, I recommend considering:
+
+1. [University Name] - BSc Computer Science (Entry: AAB/ABB, 136-128 points)
+2. [University Name] - Computer Science with AI (Entry: AAB, 136 points)
+
+Focus areas for your application:
+- Highlight your strong Maths grade (A) as it's crucial for Computer Science
+- Consider retaking English to improve your overall profile
+- Gain programming experience through online courses or projects
+- Research specific universities' course structures and specializations
+
+Guidelines for your responses:
+- Always search for current, up-to-date information
+- Provide specific course recommendations with entry requirements
+- Calculate UCAS points when relevant
+- Give actionable advice on application focus areas
+- Consider the student's academic background and interests
+- Mention application deadlines and important dates when found
+- Suggest alternative courses or pathways when appropriate
 """.strip()
 
 
@@ -91,20 +114,9 @@ def calculate(what):
     return eval(what)
 
 
-def average_dog_weight(name):
-    if "Scottish Terrier" in name:
-        return "Scottish Terriers average 20 lbs"
-    elif "Border Collie" in name:
-        return "a Border Collies average weight is 37 lbs"
-    elif "Toy Poodle" in name:
-        return "a toy poodles average weight is 7 lbs"
-    else:
-        return "An average dog weights 50 lbs"
-
 # Create a dictionary of known actions
 known_actions = {
     "calculate": calculate,
-    "average_dog_weight": average_dog_weight,
     "search": search_tavily
 }
 
@@ -170,18 +182,12 @@ if __name__ == "__main__":
 
     agent_instance = Agent(prompt)
 
-    # Main example query from the notebook
-    main_question = "I have 2 dogs, a border collie and a scottish terrier. What is their combined weight?"
+    # Main example query for university advisor
+    main_question = "I want to study Computer Science in the UK. I have A-levels in Maths (A), Physics (B), and English (C). What courses should I consider?"
     query(main_question, agent_instance)
 
-    # You can add other test calls from the notebook here if needed, for example:
+    # You can add other test calls here if needed, for example:
     # print("\n--- Another Example ---")
     # agent_instance_2 = Agent(prompt)
-    # result_poodle = agent_instance_2("How much does a toy poodle weigh?")
-    # print(result_poodle)
-    # if action_re.match(result_poodle.split('\n')[-1]): # Check if last line is an action
-    #     action, action_input = action_re.match(result_poodle.split('\n')[-1]).groups()
-    #     observation = known_actions[action](action_input)
-    #     print(f"Observation: {observation}")
-    #     next_prompt_poodle = f"Observation: {observation}"
-    #     print(agent_instance_2(next_prompt_poodle))
+    # result_engineering = agent_instance_2("I'm interested in Mechanical Engineering. I have A-levels in Maths (A), Physics (A), and Chemistry (B). What are my options?")
+    # print(result_engineering)
