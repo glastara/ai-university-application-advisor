@@ -13,7 +13,9 @@ tavily_client = None
 
 def search_tavily(query):
     if tavily_client is None:
-        raise Exception("Tavily client not initialized. Call load_dotenv_and_init_client() first.")
+        raise Exception(
+            "Tavily client not initialized. Call load_dotenv_and_init_client() first."
+        )
     response = tavily_client.search(query)
     return response
 
@@ -40,11 +42,13 @@ class Agent:
     def execute(self):
         if client is None:
             raise Exception(
-                "OpenRouter client not initialized. Call load_dotenv_and_init_client() first.")
+                "OpenRouter client not initialized. Call load_dotenv_and_init_client() first."
+            )
         completion = client.chat.completions.create(
             model="deepseek/deepseek-r1-0528-qwen3-8b:free",
             temperature=0.2,
-            messages=self.messages)
+            messages=self.messages,
+        )
         # Return message it gets back from the LLM
         return completion.choices[0].message.content
 
@@ -115,12 +119,9 @@ def calculate(what):
 
 
 # Create a dictionary of known actions
-known_actions = {
-    "calculate": calculate,
-    "search": search_tavily
-}
+known_actions = {"calculate": calculate, "search": search_tavily}
 
-action_re = re.compile(r'^Action: (\w+): (.*)$')
+action_re = re.compile(r"^Action: (\w+): (.*)$")
 
 
 def query(question, agent, max_turns=5):
@@ -128,10 +129,9 @@ def query(question, agent, max_turns=5):
     next_prompt = question
     for i in range(max_turns):
         result = agent(next_prompt)
-        print(f"--- Turn {i+1} ---")
+        print(f"--- Turn {i + 1} ---")
         print(result)
-        actions = [action_re.match(a) for a in result.split(
-            '\n') if action_re.match(a)]
+        actions = [action_re.match(a) for a in result.split("\n") if action_re.match(a)]
         if actions:
             action, action_input = actions[0].groups()
             if action not in known_actions:
@@ -156,14 +156,16 @@ def load_dotenv_and_init_client():
     _ = load_dotenv()
     api_key = os.getenv("OPENROUTER_API_KEY")
     tavily_api_key = os.getenv("TAVILY_API_KEY")
-    
+
     if not api_key:
         raise ValueError(
-            "OPENROUTER_API_KEY not found in .env file or environment variables.")
+            "OPENROUTER_API_KEY not found in .env file or environment variables."
+        )
     if not tavily_api_key:
         raise ValueError(
-            "TAVILY_API_KEY not found in .env file or environment variables.")
-            
+            "TAVILY_API_KEY not found in .env file or environment variables."
+        )
+
     client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
     tavily_client = TavilyClient(tavily_api_key)
 
