@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from tavily import TavilyClient
+import json
 
 # Global OpenRouter client
 client = None
@@ -30,6 +31,17 @@ class Agent:
         # If system prompt is not empty, add it to messages
         if self.system:
             self.messages.append({"role": "system", "content": system})
+
+    def save_history(self, filename="history.json"):
+        with open(filename, "w") as f:
+            json.dump(self.messages, f)
+
+    def load_history(self, filename="history.json"):
+        try:
+            with open(filename, "r") as f:
+                self.messages = json.load(f)
+        except FileNotFoundError:
+            pass  # No history to load, start fresh
 
     # Call the agent with a message
     def __call__(self, message):
@@ -129,6 +141,8 @@ def query(question, agent, max_turns=5):
     next_prompt = question
     for i in range(max_turns):
         result = agent(next_prompt)
+        # Save history after each turn
+        agent.save_history()
         print(f"--- Turn {i + 1} ---")
         print(result)
         actions = [action_re.match(a) for a in result.split("\n") if action_re.match(a)]
@@ -173,6 +187,10 @@ def load_dotenv_and_init_client():
 if __name__ == "__main__":
     load_dotenv_and_init_client()
 
+    agent_instance = Agent(prompt)
+    # Load history on startup
+    agent_instance.load_history()
+
     # Example of a direct chat completion (from the notebook)
     # print("Testing direct chat completion:")
     # chat_completion = client.chat.completions.create(
@@ -181,8 +199,6 @@ if __name__ == "__main__":
     # )
     # print(chat_completion.choices[0].message.content)
     # print("---\n")
-
-    agent_instance = Agent(prompt)
 
     # Main example query for university advisor
     main_question = "I want to study Computer Science in the UK. I have A-levels in Maths (A), Physics (B), and English (C). What courses should I consider?"
