@@ -186,23 +186,29 @@ def load_dotenv_and_init_client():
 
 if __name__ == "__main__":
     load_dotenv_and_init_client()
-
     agent_instance = Agent(prompt)
-    # Load history on startup
     agent_instance.load_history()
 
-    # Example of a direct chat completion (from the notebook)
-    # print("Testing direct chat completion:")
-    # chat_completion = client.chat.completions.create(
-    #     model="gpt-4.0-mini",
-    #     messages=[{"role": "user", "content": "Hello world"}]
-    # )
-    # print(chat_completion.choices[0].message.content)
-    # print("---\n")
+    print("Welcome to the University Application Advisor!")
+    print("Ask your question below. (Press Enter with no input to skip, or type anything that's not a question to exit.)")
 
-    # Main example query for university advisor
-    main_question = "I want to study Computer Science in the UK. I have A-levels in Maths (A), Physics (B), and English (C). What courses should I consider?"
-    query(main_question, agent_instance)
+    question_words = (
+        "who", "what", "when", "where", "why", "how", "which",
+        "can", "is", "are", "do", "does", "did", "will", "could", "would", "should"
+    )
+
+    while True:
+        user_input = input("\nAsk the University Advisor a question:\n> ").strip()
+        if not user_input:
+            continue  # Skip empty input
+        if (
+            user_input.endswith("?")
+            or user_input.lower().startswith(question_words)
+        ):
+            query(user_input, agent_instance)
+        else:
+            print("It looks like you have no questions for now. Goodbye.")
+            break
 
     # You can add other test calls here if needed, for example:
     # print("\n--- Another Example ---")
