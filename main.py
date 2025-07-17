@@ -116,7 +116,9 @@ Focus areas for your application:
 - Research specific universities' course structures and specializations
 
 Guidelines for your responses:
-- Always search for current, up-to-date information
+- Always search for current, up-to-date information.
+- If you do not know a specific number (such as a deposit amount), say you do not know or suggest the user check the official university website.
+- Do not make up or guess specific fees, dates, or requirements.
 - Provide specific course recommendations with entry requirements
 - Calculate UCAS points when relevant
 - Give actionable advice on application focus areas
@@ -189,7 +191,7 @@ if __name__ == "__main__":
     agent_instance = Agent(prompt)
     agent_instance.load_history()
 
-    print("Welcome to the University Application Advisor!")
+    print("Welcome to your University Application Advisor!")
     print("Ask your question below. (Press Enter with no input to skip, or type anything that's not a question to exit.)")
 
     question_words = (
@@ -198,7 +200,7 @@ if __name__ == "__main__":
     )
 
     while True:
-        user_input = input("\nAsk the University Advisor a question:\n> ").strip()
+        user_input = input("\nAsk a question:\n> ").strip()
         if not user_input:
             continue  # Skip empty input
         if (
