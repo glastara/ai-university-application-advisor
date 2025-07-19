@@ -192,7 +192,7 @@ if __name__ == "__main__":
     agent_instance.load_history()
 
     print("Welcome to your University Application Advisor!")
-    print("Ask your question below. (Press Enter with no input to skip, or type anything that's not a question to exit.)")
+    print("Ask your question below. (Write 'exit' to exit. If you don't type a question, I'll end the conversation for you.)")
 
     question_words = (
         "who", "what", "when", "where", "why", "how", "which",
@@ -201,18 +201,22 @@ if __name__ == "__main__":
 
     while True:
         user_input = input("\nAsk a question:\n> ").strip()
+        if user_input.lower() == "exit":
+            print("Goodbye!")
+            break
         if not user_input:
-            continue  # Skip empty input
+            print("It looks like you have no questions — goodbye for now :)")
+            break
         if (
             user_input.endswith("?")
             or user_input.lower().startswith(question_words)
         ):
             query(user_input, agent_instance)
         else:
-            print("It looks like you have no questions for now. Goodbye.")
+            print("It looks like you have no questions — goodbye for now :)")
             break
 
-    # You can add other test calls here if needed, for example:
+    # Can add other test calls here if needed, for example:
     # print("\n--- Another Example ---")
     # agent_instance_2 = Agent(prompt)
     # result_engineering = agent_instance_2("I'm interested in Mechanical Engineering. I have A-levels in Maths (A), Physics (A), and Chemistry (B). What are my options?")
