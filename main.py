@@ -186,6 +186,33 @@ def load_dotenv_and_init_client():
     tavily_client = TavilyClient(tavily_api_key)
 
 
+def is_question(user_input):
+    # List of question words
+    question_words = [
+        "who", "what", "when", "where", "why", "how", "which",
+        "can", "is", "are", "do", "does", "did", "will", "could", "would", "should"
+    ]
+    # Lowercase input for easier matching
+    input_lower = user_input.lower().strip()
+    # Check for question word anywhere in the input
+    for word in question_words:
+        if re.search(rf"\b{word}\b", input_lower):
+            return True
+    # Optionally, filter out known non-question statements ending with '?'
+    non_questions = [
+        "i have no more questions",
+        "that's all",
+        "no more questions"
+    ]
+    for statement in non_questions:
+        if input_lower.startswith(statement) and input_lower.endswith("?"):
+            return False
+    # If it ends with a question mark, treat as a question (unless filtered above)
+    if input_lower.endswith("?"):
+        return True
+    return False
+
+
 if __name__ == "__main__":
     load_dotenv_and_init_client()
     agent_instance = Agent(prompt)
@@ -194,26 +221,18 @@ if __name__ == "__main__":
     print("Welcome to your University Application Advisor!")
     print("Ask your question below. (Write 'exit' to exit. If you don't type a question, I'll end the conversation for you.)")
 
-    question_words = (
-        "who", "what", "when", "where", "why", "how", "which",
-        "can", "is", "are", "do", "does", "did", "will", "could", "would", "should"
-    )
-
     while True:
         user_input = input("\nAsk a question:\n> ").strip()
         if user_input.lower() == "exit":
             print("Goodbye!")
             break
         if not user_input:
-            print("It looks like you have no questions — goodbye for now :)")
+            print("It looks like you have no questions for now. Goodbye.")
             break
-        if (
-            user_input.endswith("?")
-            or user_input.lower().startswith(question_words)
-        ):
+        if is_question(user_input):
             query(user_input, agent_instance)
         else:
-            print("It looks like you have no questions — goodbye for now :)")
+            print("It looks like you have no questions for now. Goodbye.")
             break
 
     # Can add other test calls here if needed, for example:
