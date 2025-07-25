@@ -189,8 +189,23 @@ def load_dotenv_and_init_client():
 def is_question(user_input):
     # List of question words
     question_words = [
-        "who", "what", "when", "where", "why", "how", "which",
-        "can", "is", "are", "do", "does", "did", "will", "could", "would", "should"
+        "who",
+        "what",
+        "when",
+        "where",
+        "why",
+        "how",
+        "which",
+        "can",
+        "is",
+        "are",
+        "do",
+        "does",
+        "did",
+        "will",
+        "could",
+        "would",
+        "should",
     ]
     # Lowercase input for easier matching
     input_lower = user_input.lower().strip()
@@ -199,11 +214,7 @@ def is_question(user_input):
         if re.search(rf"\b{word}\b", input_lower):
             return True
     # Optionally, filter out known non-question statements ending with '?'
-    non_questions = [
-        "i have no more questions",
-        "that's all",
-        "no more questions"
-    ]
+    non_questions = ["i have no more questions", "that's all", "no more questions"]
     for statement in non_questions:
         if input_lower.startswith(statement) and input_lower.endswith("?"):
             return False
@@ -219,7 +230,9 @@ if __name__ == "__main__":
     agent_instance.load_history()
 
     print("Welcome to your University Application Advisor!")
-    print("Ask your question below. (Write 'exit' to exit. If you don't type a question, I'll end the conversation for you.)")
+    print(
+        "Ask your question below. (Write 'exit' to exit. If you don't type a question, I'll end the conversation for you.)"
+    )
 
     while True:
         user_input = input("\nAsk a question:\n> ").strip()
