@@ -54,7 +54,7 @@ class Agent:
     def execute(self):
         if client is None:
             raise Exception(
-                "OpenRouter client not initialized. Call load_dotenv_and_init_client() first."
+                "OpenRouter client not initialised. Call load_dotenv_and_init_client() first."
             )
         completion = client.chat.completions.create(
             model="deepseek/deepseek-r1-0528-qwen3-8b:free",
@@ -113,7 +113,7 @@ Focus areas for your application:
 - Highlight your strong Maths grade (A) as it's crucial for Computer Science
 - Consider retaking English to improve your overall profile
 - Gain programming experience through online courses or projects
-- Research specific universities' course structures and specializations
+- Research specific universities' course structures and specialisations
 
 Guidelines for your responses:
 - Always search for current, up-to-date information.
