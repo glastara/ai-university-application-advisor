@@ -15,7 +15,7 @@ tavily_client = None
 def search_tavily(query):
     if tavily_client is None:
         raise Exception(
-            "Tavily client not initialized. Call load_dotenv_and_init_client() first."
+            "Tavily client not initialised. Call load_dotenv_and_init_client() first."
         )
     response = tavily_client.search(query)
     return response
