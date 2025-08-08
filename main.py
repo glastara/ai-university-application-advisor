@@ -57,7 +57,7 @@ class Agent:
                 "OpenRouter client not initialised. Call load_dotenv_and_init_client() first."
             )
         completion = client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528-qwen3-8b:free",
+            model="deepseek/deepseek-r1-0528-qwen3-8b:free", # Consider changing to lower latency model for increased speed
             temperature=0.2,
             messages=self.messages,
         )
