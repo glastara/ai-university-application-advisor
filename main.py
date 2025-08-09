@@ -70,16 +70,12 @@ class Agent:
                 )
 
             completion = client.chat.completions.create(
-                model=self.model,
-                temperature=0.2,
-                messages=messages
+                model=self.model, temperature=0.2, messages=messages
             )
         else:
             # Original behavior for other models
             completion = client.chat.completions.create(
-                model=self.model,
-                temperature=0.2,
-                messages=self.messages
+                model=self.model, temperature=0.2, messages=self.messages
             )
 
         return completion.choices[0].message.content
