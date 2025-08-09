@@ -23,9 +23,10 @@ def search_tavily(query):
 
 class Agent:
     # Initialise the agent with a system prompt
-    def __init__(self, system=""):
-        # Save system prompt
+    def __init__(self, system="", model="google/gemma-3n-e4b-it:free"):
+        # Save system prompt and model
         self.system = system
+        self.model = model
         # Initialise messages list
         self.messages = []
         # If system prompt is not empty, add it to messages
@@ -56,13 +57,41 @@ class Agent:
             raise Exception(
                 "OpenRouter client not initialised. Call load_dotenv_and_init_client() first."
             )
-        completion = client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528-qwen3-8b:free", # Consider changing to lower latency model for increased speed
-            temperature=0.2,
-            messages=self.messages,
-        )
-        # Return message it gets back from the LLM
+        # For Google models, must merge system message with the first user message
+
+        if "gemma" in self.model.lower():
+            messages = self.messages.copy()
+            if messages and messages[0]["role"] == "system":
+                system_msg = messages.pop(0)
+            if messages and messages[0]["role"] == "user":
+                # Prepend system message to the first user message
+                messages[0]["content"] = (
+                    f"SYSTEM: {system_msg['content']}\n\nUSER: {messages[0]['content']}"
+                )
+
+            completion = client.chat.completions.create(
+                model=self.model,
+                temperature=0.2,
+                messages=messages
+            )
+        else:
+            # Original behavior for other models
+            completion = client.chat.completions.create(
+                model=self.model,
+                temperature=0.2,
+                messages=self.messages
+            )
+
         return completion.choices[0].message.content
+
+
+# Add model as a class attribute
+def __init__(self, system="", model="google/gemma-3n-e4b-it:free"):
+    self.system = system
+    self.messages = []
+    self.model = model
+    if self.system:
+        self.messages.append({"role": "system", "content": self.system})
 
 
 prompt = """
@@ -133,25 +162,27 @@ def safe_calculate(expression):
     try:
         # Remove any whitespace
         expression = expression.strip()
-        
+
         # Check if this looks like a mathematical expression
         # Allow more characters but still block dangerous ones
-        dangerous_chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_[]{}|\\`~@#$%^')
+        dangerous_chars = set(
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_[]{}|\\`~@#$%^"
+        )
         if any(c in dangerous_chars for c in expression):
             raise ValueError("Expression contains potentially dangerous characters")
-        
+
         # Allow mathematical and safe characters
         # This includes: numbers, basic operators, parentheses, spaces, dots, commas
-        safe_chars = set('0123456789+-*/()., ')
+        safe_chars = set("0123456789+-*/()., ")
         if not all(c in safe_chars for c in expression):
             # If it contains other characters, it might not be a math expression
             # Let's check if it's still safe to process
             other_chars = set(expression) - safe_chars
             if any(c in dangerous_chars for c in other_chars):
                 raise ValueError("Expression contains potentially dangerous characters")
-        
+
         # Use our safe parser for mathematical expressions
-        if '(' in expression or ')' in expression:
+        if "(" in expression or ")" in expression:
             # Handle parentheses by evaluating inner expressions first
             return evaluate_expression(expression)
         else:
@@ -165,53 +196,54 @@ def evaluate_simple_expression(expr):
     """Evaluate simple arithmetic expressions without parentheses"""
     # Split by operators, preserving them
     import re
-    parts = re.split(r'([+\-*/])', expr.replace(' ', ''))
+
+    parts = re.split(r"([+\-*/])", expr.replace(" ", ""))
     parts = [p for p in parts if p]
-    
+
     if len(parts) == 1:
         return float(parts[0])
-    
+
     # Handle multiplication and division first
     i = 1
     while i < len(parts) - 1:
-        if parts[i] in ['*', '/']:
-            left = float(parts[i-1])
-            right = float(parts[i+1])
-            if parts[i] == '*':
+        if parts[i] in ["*", "/"]:
+            left = float(parts[i - 1])
+            right = float(parts[i + 1])
+            if parts[i] == "*":
                 result = left * right
             else:
                 if right == 0:
                     raise ValueError("Division by zero")
                 result = left / right
-            parts[i-1:i+2] = [str(result)]
+            parts[i - 1 : i + 2] = [str(result)]
             i -= 1
         i += 2
-    
+
     # Handle addition and subtraction
     result = float(parts[0])
     for i in range(1, len(parts), 2):
         if i + 1 < len(parts):
-            if parts[i] == '+':
-                result += float(parts[i+1])
-            elif parts[i] == '-':
-                result -= float(parts[i+1])
-    
+            if parts[i] == "+":
+                result += float(parts[i + 1])
+            elif parts[i] == "-":
+                result -= float(parts[i + 1])
+
     return result
 
 
 def evaluate_expression(expr):
     """Evaluate expressions with parentheses"""
     # Find innermost parentheses
-    while '(' in expr:
-        start = expr.rfind('(')
-        end = expr.find(')', start)
+    while "(" in expr:
+        start = expr.rfind("(")
+        end = expr.find(")", start)
         if end == -1:
             raise ValueError("Mismatched parentheses")
-        
-        inner_expr = expr[start+1:end]
+
+        inner_expr = expr[start + 1 : end]
         inner_result = evaluate_simple_expression(inner_expr)
-        expr = expr[:start] + str(inner_result) + expr[end+1:]
-    
+        expr = expr[:start] + str(inner_result) + expr[end + 1 :]
+
     return evaluate_simple_expression(expr)
 
 
@@ -272,8 +304,23 @@ def load_dotenv_and_init_client():
 def is_question(user_input):
     # List of question words
     question_words = [
-        "who", "what", "when", "where", "why", "how", "which",
-        "can", "is", "are", "do", "does", "did", "will", "could", "would", "should"
+        "who",
+        "what",
+        "when",
+        "where",
+        "why",
+        "how",
+        "which",
+        "can",
+        "is",
+        "are",
+        "do",
+        "does",
+        "did",
+        "will",
+        "could",
+        "would",
+        "should",
     ]
     # Lowercase input for easier matching
     input_lower = user_input.lower().strip()
@@ -295,37 +342,32 @@ def is_question(user_input):
 def get_ucas_points(grade, subject_type="A-level"):
     """Get UCAS points for a given grade and subject type"""
     ucas_points = {
-        "A-level": {
-            "A*": 56, "A": 48, "B": 40, "C": 32, "D": 24, "E": 16
-        },
-        "AS-level": {
-            "A": 20, "B": 16, "C": 12, "D": 10, "E": 6
-        },
-        "BTEC": {
-            "D*": 56, "D": 48, "M": 32, "P": 16
-        }
+        "A-level": {"A*": 56, "A": 48, "B": 40, "C": 32, "D": 24, "E": 16},
+        "AS-level": {"A": 20, "B": 16, "C": 12, "D": 10, "E": 6},
+        "BTEC": {"D*": 56, "D": 48, "M": 32, "P": 16},
     }
-    
+
     try:
         return ucas_points.get(subject_type, {}).get(grade.upper(), 0)
     except:
         return 0
 
+
 def calculate_ucas_total(grades_input):
     """Calculate total UCAS points from a list of grades"""
     try:
         # Parse input like "Maths A, Physics B, English C"
-        grades = [g.strip() for g in grades_input.split(',')]
+        grades = [g.strip() for g in grades_input.split(",")]
         total = 0
         breakdown = []
-        
+
         for grade_entry in grades:
-            if ' ' in grade_entry:
-                subject, grade = grade_entry.rsplit(' ', 1)
+            if " " in grade_entry:
+                subject, grade = grade_entry.rsplit(" ", 1)
                 points = get_ucas_points(grade)
                 total += points
                 breakdown.append(f"{subject}: {grade} = {points} points")
-        
+
         result = f"Total UCAS points: {total}\nBreakdown:\n" + "\n".join(breakdown)
         return result
     except Exception as e:
@@ -334,11 +376,14 @@ def calculate_ucas_total(grades_input):
 
 if __name__ == "__main__":
     load_dotenv_and_init_client()
-    agent_instance = Agent(prompt)
+    # Initialise agent with model
+    agent_instance = Agent(prompt, model="google/gemma-3n-e4b-it:free")
     agent_instance.load_history()
 
     print("Welcome to your University Application Advisor!")
-    print("Ask your question below. (Write 'exit' to exit. If you don't type a question, I'll end the conversation for you.)")
+    print(
+        "Ask your question below. (Write 'exit' to exit. If you don't type a question, I'll end the conversation for you.)"
+    )
 
     while True:
         user_input = input("\nAsk a question:\n> ").strip()
