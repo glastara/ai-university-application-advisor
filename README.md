@@ -1,4 +1,4 @@
-# University Application Advisor - ReAct Agent
+# AI University Application Advisor (ReAct Agent)
 
 **Attribution:**
 This code is based on materials from the AI Agents in LangGraph course by DeepLearning.AI, which itself is based on [Simon Willison's Python ReAct pattern](https://til.simonwillison.net/llms/python-react-pattern).
@@ -94,3 +94,54 @@ The agent can help with:
 - **Tavily API Key**: For real-time web search capabilities
 
 Both services offer free tiers suitable for testing and development (trust me, I checked — very broke at the time of making this).
+
+## Testing
+
+You can run the test suite using pytest. Ensure dependencies are installed (pytest is included in `requirements.txt`).
+
+1. Install dependencies (inside your virtual environment):
+```bash
+pip install -r requirements.txt
+```
+
+2. Run all tests (recommended):
+```bash
+python3 -m pytest -q
+```
+
+3. Run tests for a single file (this repository uses `test_main.py`):
+```bash
+python3 -m pytest -q test_main.py
+```
+
+4. See which tests ran, their names, and pass/fail status (recommended):
+```bash
+python3 -m pytest -vv
+```
+
+Note: To also see print output from tests, append `-s` (e.g., `python3 -m pytest -vv -s`).
+
+Notes:
+- The tests include logic to exercise the ReAct loop using mock agents and stubbed search calls, so no external API calls are made during testing.
+- To run just a single test function, you can use the `-k` flag, for example:
+```bash
+python3 -m pytest -k test_query_flow_with_mock_agent_calculate -vv -s
+```
+
+## Suggested improvements
+
+This project is an MVP built with a free model, so responses can be slow and there is plenty of room for improvement. Ideas for future contributors:
+- Improve response speed (currently approx 30 secs) and quality by using a stronger model and enabling streaming output.
+- Add more assertions and structured checks in tests (beyond prints) and increase coverage.
+- Introduce retries and backoff for network calls; cache stable lookups; normalise citation formats.
+- Expand qualification handling (IB, BTEC, Scottish qualifications) and verified equivalency lookups.
+- Enhance the ReAct loop with stricter output validation and better error handling on missing observations.
+- Add configuration for year of entry, fee status, and subject preferences; persist user profile between runs.
+- Provide a lightweight UI (CLI flags or simple web UI) for easier use.
+- Add pre-commit hooks (formatting, linting, security/secret scans) and CI to run tests automatically.
+
+This repository intentionally uses UK English throughout.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
