@@ -5,7 +5,7 @@ This code is based on materials from the AI Agents in LangGraph course by DeepLe
 
 This project implements a ReAct (Reasoning and Acting) agent that acts as an expert University Application Advisor specialising in UK higher education. The agent combines reasoning and acting to help students find suitable courses and provide guidance on their university applications using real-time web search capabilities.
 
-This repository also serves as a lightweight MVP for my AI university application advisor business, [Anyverse](https://www.anyverse.app).
+This repository also serves as a lightweight, terminal-run version of my AI university application advisor business, [Anyverse](https://www.anyverse.app).
 
 ## Project Structure
 - `main.py`: Contains the complete implementation including:
