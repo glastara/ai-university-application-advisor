@@ -403,7 +403,7 @@ if __name__ == "__main__":
     agent_instance = Agent(prompt, model="google/gemma-3n-e4b-it:free")
     agent_instance.load_history()
 
-    print("Welcome! I'm your personal University Application Advisor!")
+    print("Welcome! I'm your personal University Application Advisor :)")
     print(
         "Ask me anything related to university applications. (Write 'exit' to exit. If you don't type a question, I'll end the conversation for you.)"
     )
